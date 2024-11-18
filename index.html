@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minimal New Tab</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="quote-container">
+    <p id="quote-text">Loading quote...</p>
+    <p id="quote-author">- Loading...</p>
+  </div>
+  <script>
+    // Send a message to background.js to fetch the image and quote
+    chrome.runtime.sendMessage({ action: 'fetchData' }, (response) => {
+      const { backgroundImage, quote } = response;
+      
+      // Set the background image
+      document.body.style.backgroundImage = `url(${backgroundImage})`;
+      document.body.style.backgroundSize = 'cover';
+      document.body.style.backgroundPosition = 'center center';
+
+      // Update the quote text and author
+      document.getElementById('quote-text').innerText = quote.content;
+      document.getElementById('quote-author').innerText = `- ${quote.author}`;
+    });
+  </script>
+</body>
+</html>

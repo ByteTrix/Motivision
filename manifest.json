@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "Minimal New Tab",
+  "version": "1.0",
+  "description": "A minimalist new tab with motivational quotes and beautiful backgrounds.",
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": [
+    "storage",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "https://api.unsplash.com/*",
+    "https://api.quotable.io/*"
+  ],
+  "icons": {
+    "48": "icon.png"
+  }
+}
