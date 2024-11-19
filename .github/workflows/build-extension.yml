@@ -1,7 +1,9 @@
 name: Release
 
 on:
-  workflow_dispatch:  # Trigger manually from GitHub UI
+  push:
+    tags:
+      - 'v*'  # Trigger on any tag that starts with 'v' (e.g., v1.0.0, v1.1.0)
 
 jobs:
   release:
@@ -9,7 +11,7 @@ jobs:
       contents: write  # Allow write access to release assets
       issues: write
       pull-requests: write
-    runs-on: ubuntu-latest  # You can change this to windows-latest if needed
+    runs-on: windows-latest  # Use Windows environment for the job
 
     steps:
       # 1. Checkout the repository
@@ -21,7 +23,7 @@ jobs:
       # 2. Setup Node.js
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'  # You can change this if your project needs another Node.js version
+          node-version: '20'  # Use the appropriate Node.js version for your project
 
       # 3. Install dependencies
       - run: npm ci  # Clean install (faster and more reliable than npm install)
@@ -37,10 +39,10 @@ jobs:
           application_id: ${{ secrets.RELEASE_APP_ID }}  # Store application ID in Secrets
           application_private_key: ${{ secrets.RELEASE_APP_CERT }}  # Store the private key in Secrets
 
-      # 6. Create the release and upload the assets to GitHub Releases
+      # 6. Create GitHub Release and upload assets
       - name: Create GitHub Release
         run: |
-          release_tag="v$(date +'%Y%m%d%H%M%S')"  # Or use a git tag, e.g., $(git describe --tags)
+          release_tag="${GITHUB_REF#refs/tags/}"  # Extract the tag name
           gh release create $release_tag dist/chrome/* dist/firefox/* --title "New Release" --notes "Release of the Chrome and Firefox extensions."
         env:
           GITHUB_TOKEN: ${{ steps.get_workflow_token.outputs.token }}  # Use the token from the previous step
