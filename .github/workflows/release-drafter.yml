@@ -1,14 +1,12 @@
 name: Release Drafter
 
-# This config allows drafts to be automatically created for new releases
-# on `push` to `main` (or any other branch you want to track).
 on:
   push:
     branches:
-      - main  # Change this if your default branch is not 'main'
+      - main  # Or use 'master' or another branch name
+    tags:
+      - 'v*'  # This triggers when a new version tag is pushed
 
-# This sets up the draft with the format of the changelog notes
-# based on the commits that have happened.
 jobs:
   draft_release:
     runs-on: ubuntu-latest
@@ -16,15 +14,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Release Drafter
+      - name: Set up Release Drafter
         uses: release-drafter/release-drafter@v6
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # GitHub token for authenticating API requests
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # GitHub token for authentication
         with:
-          # You can customize the changelog format here
           config-name: release-drafter.yml
-          version: ${{ env.VERSION }}  # Pass the version from your workflow if needed
-          # Optionally include additional changelog settings
+          version: ${{ github.ref }}  # You can adjust this depending on your versioning system
           template: |
             ## What's Changed
             ${{changelog}}
