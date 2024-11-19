@@ -1,15 +1,10 @@
 // api/handler.js
 export default async function handler(req, res) {
-  const apiKey = process.env.UNSPLASH_API;  // Securely fetch API key from environment variables
+  const apiKey = process.env.UNS_API;  // Securely fetch API key from environment variables
 
   if (!apiKey) {
     console.error("Unsplash API key is missing");
     return res.status(400).json({ error: "Unsplash API key is missing" });  // Handle missing API key
-  }
-
-  // Log the API key only in local environment (development)
-  if (process.env.NODE_ENV !== 'production') {
-    console.log("Unsplash API Key:", apiKey);  // Log the API key in development for debugging purposes
   }
 
   // Define the Unsplash API URL
