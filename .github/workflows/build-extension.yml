@@ -86,7 +86,13 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+    - name: Verify tag exists
+      run: |
+        git fetch --tags
+        git tag -l  # List all tags to verify the new tag is present
+
     - name: Create GitHub Release
+      if: env.EXISTING_TAG == 'false'  # Ensure that this runs only if a new tag was created
       uses: softprops/action-gh-release@v1
       with:
         files: |
