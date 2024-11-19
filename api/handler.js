@@ -1,5 +1,15 @@
 // api/handler.js
 export default async function handler(req, res) {
+  // Add CORS headers to allow requests from any origin
+  res.setHeader('Access-Control-Allow-Origin', '*');  // Allow all origins
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');  // Allow GET and OPTIONS methods
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');  // Allow Content-Type header
+
+  // Handle preflight request (OPTIONS)
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();  // Return 200 for preflight requests
+  }
+
   const apiKey = process.env.UNS_API;  // Securely fetch API key from environment variables
 
   if (!apiKey) {

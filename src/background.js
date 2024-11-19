@@ -3,7 +3,7 @@ chrome.runtime.onInstalled.addListener(() => {
 });
 
 async function fetchImageAndQuote() {
-  const apiUrl = "https://motivision.vercel.app/api/handler.js";  // Vercel-hosted API URL
+  const apiUrl = "https://motivision.vercel.app/api/handler.js";  // Vercel-hosted API URL for the image
 
   try {
     // Fetch image URL from the Vercel API
@@ -28,7 +28,11 @@ async function fetchImageAndQuote() {
         });
 
         console.log("Fetched and stored image and quote successfully.");
+      } else {
+        console.error("Quote fetch failed.");
       }
+    } else {
+      console.error("Image fetch failed: No image URL in the response.");
     }
   } catch (error) {
     console.error("Error fetching image and quote:", error);
@@ -45,6 +49,8 @@ async function fetchQuote() {
 
     if (data) {
       return data; // Return quote data
+    } else {
+      console.error("Quote data not found.");
     }
   } catch (error) {
     console.error("Error fetching quote:", error);

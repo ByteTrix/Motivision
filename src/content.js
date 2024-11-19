@@ -33,16 +33,16 @@ document.addEventListener("DOMContentLoaded", function () {
     quoteContainer.style.display = 'block';
 
     // Fetch new image and quote in the background
-    fetchImage();
-    fetchQuote();
+    fetchImageAndQuote();
   });
 
-  // Fetch a new background image from your Vercel-hosted API
-  async function fetchImage() {
-    const API_URL = "https://motivision.vercel.app/api/handler.js"; // URL to Vercel-hosted API
+  // Fetch new background image and quote in the background
+  async function fetchImageAndQuote() {
+    const apiUrl = "https://motivision.vercel.app/api/handler.js"; // URL to Vercel-hosted API for the image
 
     try {
-      const response = await fetch(API_URL);
+      // Fetch the background image URL
+      const response = await fetch(apiUrl);
       const data = await response.json();
 
       if (data && data.imageUrl) {
@@ -50,9 +50,14 @@ document.addEventListener("DOMContentLoaded", function () {
         chrome.storage.local.set({ backgroundImage: imageUrl }); // Store new image URL
         document.body.style.backgroundImage = `url(${imageUrl})`; // Update background image
         console.log("Fetched and stored new image URL.");
+      } else {
+        console.error("No image URL found in API response.");
       }
+
+      // Fetch and store a new motivational quote
+      await fetchQuote();
     } catch (error) {
-      console.error("Error fetching image:", error);
+      console.error("Error fetching image and quote:", error);
     }
   }
 
@@ -73,6 +78,11 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         console.log(`Fetched and stored new quote: "${newQuote}" by ${newAuthor}`);
+        // Update quote on the page after fetching a new one
+        quoteElement.textContent = `"${newQuote}"`;
+        authorElement.textContent = `- ${newAuthor}`;
+      } else {
+        console.error("Failed to fetch quote.");
       }
     } catch (error) {
       console.error("Error fetching quote:", error);
