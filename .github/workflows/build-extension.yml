@@ -28,13 +28,13 @@ jobs:
       run: npm run build  # Run your build script for both Chrome and Firefox
 
     - name: Upload Chrome Extension to GitHub Releases (optional)
-      uses: gh actions/upload-artifact@v3
+      uses: actions/upload-artifact@v3
       with:
         name: chrome-extension
         path: dist/chrome
 
     - name: Upload Firefox Extension to GitHub Releases (optional)
-      uses: gh actions/upload-artifact@v3
+      uses: actions/upload-artifact@v3
       with:
         name: firefox-extension
         path: dist/firefox
