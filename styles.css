@@ -93,6 +93,17 @@ body {
   font-weight: bold;
 }
 
+/* Loader */
+#loader {
+  font-size: 24px;
+  color: #fff;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-weight: bold;
+}
+
 /* Mobile responsiveness */
 @media screen and (max-width: 768px) {
   body {
