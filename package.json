@@ -1,0 +1,19 @@
+{
+  "name": "newtab",
+  "version": "1.0.0",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "scripts": {
+    "build:chrome": "npm-run-all build:chrome:files",
+    "build:firefox": "npm-run-all build:firefox:files",
+    "build:chrome:files": "copyfiles -u 1 src/* dist/chrome",
+    "build:firefox:files": "copyfiles -u 1 src/* dist/firefox",
+    "build": "npm-run-all build:chrome build:firefox"
+  },
+  "devDependencies": {
+    "copyfiles": "^2.4.1",
+    "npm-run-all": "^4.1.5"
+  }
+}
