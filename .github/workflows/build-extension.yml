@@ -60,7 +60,7 @@ jobs:
     - name: Check if tag exists
       id: check_tag
       run: |
-        git fetch --tags  # Fetch tags from remote
+        echo "Checking if tag v${{ env.NEW_VERSION }} exists..."
         if git rev-parse "v${{ env.NEW_VERSION }}" >/dev/null 2>&1; then
           echo "Tag v${{ env.NEW_VERSION }} already exists, skipping creation."
           echo "EXISTING_TAG=true" >> $GITHUB_ENV
