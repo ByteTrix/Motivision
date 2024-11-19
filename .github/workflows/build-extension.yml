@@ -86,18 +86,20 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Verify tag exists
+    - name: Verify the tag for release
       run: |
+        echo "Tag for release: ${{ env.NEW_VERSION }}"
         git fetch --tags
         git tag -l  # List all tags to verify the new tag is present
 
     - name: Create GitHub Release
-      if: env.EXISTING_TAG == 'false'  # Ensure that this runs only if a new tag was created
+      if: env.EXISTING_TAG == 'false'  # Ensure this runs only if a new tag was created
       uses: softprops/action-gh-release@v1
       with:
+        tag_name: ${{ env.NEW_VERSION }}  # Explicitly pass the tag to the release action
         files: |
           dist/chrome/*
           dist/firefox/*
 
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Ensure the token has write permissions to push and create releases
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
