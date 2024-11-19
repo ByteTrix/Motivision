@@ -1,0 +1,40 @@
+name: Build Extension
+
+on:
+  push:
+    branches:
+      - main  # Trigger the workflow on push to the main branch
+  pull_request:
+    branches:
+      - main  # Trigger the workflow on PR to the main branch
+
+jobs:
+  build:
+    runs-on: windows-latest  # Use Windows runner to support PowerShell commands
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'  # You can use the latest LTS version here
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Build for Chrome and Firefox
+      run: npm run build  # Run your build script for both Chrome and Firefox
+
+    - name: Upload Chrome Extension to GitHub Releases (optional)
+      uses: gh actions/upload-artifact@v3
+      with:
+        name: chrome-extension
+        path: dist/chrome
+
+    - name: Upload Firefox Extension to GitHub Releases (optional)
+      uses: gh actions/upload-artifact@v3
+      with:
+        name: firefox-extension
+        path: dist/firefox
