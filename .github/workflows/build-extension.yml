@@ -1,67 +1,46 @@
-name: Build and Release Extension
+name: Release
 
 on:
-  push:
-    branches:
-      - main  # Trigger the workflow on push to the main branch
+  workflow_dispatch:  # Trigger manually from GitHub UI
 
 jobs:
-  build:
-    runs-on: windows-latest  # Use Windows runner to support PowerShell commands
-
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
-
-    - name: Set up Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '16'  # Use the latest LTS version
-
-    - name: Install dependencies
-      run: npm install
-
-    - name: Build for Chrome and Firefox
-      run: npm run build  # Run your build script for both Chrome and Firefox
-
   release:
-    runs-on: ubuntu-latest  # Use Linux runner for GitHub Release
+    permissions:
+      contents: write  # Allow write access to release assets
+      issues: write
+      pull-requests: write
+    runs-on: ubuntu-latest  # You can change this to windows-latest if needed
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      # 1. Checkout the repository
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch full commit history
+          persist-credentials: false  # Don't persist credentials for later use
 
-    - name: Create a Tag
-      id: create_tag
-      run: |
-        TAG_NAME="v$(date +'%Y%m%d%H%M%S')"  # You can customize the tag format
-        echo "Creating tag: $TAG_NAME"
-        git tag $TAG_NAME
-        git push origin $TAG_NAME
+      # 2. Setup Node.js
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'  # You can change this if your project needs another Node.js version
 
-    - name: Create GitHub Release
-      id: create_release
-      uses: softprops/action-gh-release@v1
-      with:
-        files: |
-          dist/chrome/*
-          dist/firefox/*
+      # 3. Install dependencies
+      - run: npm ci  # Clean install (faster and more reliable than npm install)
 
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # 4. Build your project (assumes your build process is in the 'build' script)
+      - run: npm run build  # Ensure this produces both dist/chrome and dist/firefox
 
-    - name: Upload Chrome Extension to GitHub Release
-      uses: softprops/action-gh-release@v1
-      with:
-        files: dist/chrome/*
+      # 5. Get the Release Token (if you're using an external app for managing releases)
+      - name: Get Release Token
+        id: get_workflow_token
+        uses: peter-murray/workflow-application-token-action@v3
+        with:
+          application_id: ${{ secrets.RELEASE_APP_ID }}  # Store application ID in Secrets
+          application_private_key: ${{ secrets.RELEASE_APP_CERT }}  # Store the private key in Secrets
 
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: Upload Firefox Extension to GitHub Release
-      uses: softprops/action-gh-release@v1
-      with:
-        files: dist/firefox/*
-
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # 6. Create the release and upload the assets to GitHub Releases
+      - name: Create GitHub Release
+        run: |
+          release_tag="v$(date +'%Y%m%d%H%M%S')"  # Or use a git tag, e.g., $(git describe --tags)
+          gh release create $release_tag dist/chrome/* dist/firefox/* --title "New Release" --notes "Release of the Chrome and Firefox extensions."
+        env:
+          GITHUB_TOKEN: ${{ steps.get_workflow_token.outputs.token }}  # Use the token from the previous step
