@@ -1,25 +1,29 @@
-name: Release Drafter
+name-template: 'v$RESOLVED_VERSION 🎉'
+tag-template: 'v$RESOLVED_VERSION'
+categories:
+  - title: '✨ New Features'
+    labels:
+      - 'feature'
+  - title: '🐞 Bug Fixes'
+    labels:
+      - 'fix'
+  - title: '⚙️ Maintenance'
+    labels:
+      - 'chore'
+change-template: '- $TITLE by @$AUTHOR (#$NUMBER)'
+change-title-escapes: '\<*_&' # Escape special characters
+version-resolver:
+  major:
+    labels:
+      - 'major'
+  minor:
+    labels:
+      - 'minor'
+  patch:
+    labels:
+      - 'patch'
+  default: patch
+template: |
+  ## Latest Changes
 
-on:
-  push:
-    branches:
-      - main  # Use the correct branch
-    tags:
-      - 'v*'  # Use tag-based releases
-
-jobs:
-  draft_release:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Release Drafter
-        uses: release-drafter/release-drafter@v6
-        with:
-          config-name: release-drafter.yml
-          version: ${{ github.ref }}  # The version will be based on the tag, like 'v1.0.0'
-          template: |
-            ## What's Changed
-            - Added new feature
+  $CHANGES
