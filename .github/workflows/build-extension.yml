@@ -54,20 +54,21 @@ jobs:
         echo "New version: $new_version"
         echo "NEW_VERSION=$new_version" >> $GITHUB_ENV
 
-    - name: Check if tag exists
-      id: check_tag
+    - name: Delete existing tag if exists
+      id: delete_existing_tag
       run: |
         git fetch --tags  # Fetch the tags from remote
         if git rev-parse "v${{ env.NEW_VERSION }}" >/dev/null 2>&1; then
-          echo "Tag v${{ env.NEW_VERSION }} already exists"
-          exit 1  # Exit if tag already exists
+          echo "Tag v${{ env.NEW_VERSION }} exists, deleting it"
+          git tag -d "v${{ env.NEW_VERSION }}"  # Delete the local tag
+          git push origin --delete "v${{ env.NEW_VERSION }}"  # Delete the remote tag
         else
           echo "Tag v${{ env.NEW_VERSION }} does not exist"
         fi
 
-    - name: Create and push tag
+    - name: Create and push new tag
       run: |
-        echo "Creating tag: ${{ env.NEW_VERSION }}"
+        echo "Creating new tag: ${{ env.NEW_VERSION }}"
         git tag ${{ env.NEW_VERSION }}  # Create a new tag locally
         git push origin ${{ env.NEW_VERSION }}  # Push the tag to the repository
 
