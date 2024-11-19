@@ -1,4 +1,4 @@
-name: Pre-Release Motivision Extension
+name: Release Motivision Extension
 
 permissions:
   contents: write
@@ -25,17 +25,21 @@ jobs:
           echo "VERSION=$version" >> $env:GITHUB_ENV
         shell: pwsh
 
+      - name: Build Chrome and Firefox Extensions
+        run: |
+          npm run build
+
       - name: Upload Chrome Extension as artifact
         uses: actions/upload-artifact@v4
         with:
           name: chrome-extension
-          path: ./dist/chrome
+          path: dist/chrome/**/*
 
       - name: Upload Firefox Extension as artifact
         uses: actions/upload-artifact@v4
         with:
           name: firefox-extension
-          path: ./dist/firefox
+          path: dist/firefox/**/*
 
       - name: Generate Release Notes
         id: generate_notes
@@ -51,14 +55,16 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.VERSION }}
-          name: Pre-Release ${{ env.VERSION }}
+          name: Release ${{ env.VERSION }}
           body: |
             ${{ steps.generate_notes.outputs.body }}
 
             ![GitHub Downloads (specific asset, specific tag)](https://img.shields.io/github/downloads/Kxvin/motivision/${{ env.VERSION }}/chrome-extension)
             ![GitHub Downloads (specific asset, specific tag)](https://img.shields.io/github/downloads/Kxvin/motivision/${{ env.VERSION }}/firefox-extension)
           append_body: false
-          files: ./dist/chrome, ./dist/firefox  # Upload both Chrome and Firefox builds
-          prerelease: true
+          files: |
+            dist/chrome/**/* 
+            dist/firefox/**/* # Correctly specifying both paths
+          prerelease: false # This ensures it's a normal release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
