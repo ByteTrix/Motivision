@@ -1,40 +1,68 @@
-name: Build Extension
+name: Pre-Release Motivision Extension
+
+permissions:
+  contents: write
+  actions: read
 
 on:
-  push:
-    branches:
-      - main  # Trigger the workflow on push to the main branch
-  pull_request:
-    branches:
-      - main  # Trigger the workflow on PR to the main branch
+  workflow_dispatch: # Manual trigger
 
 jobs:
-  build:
-    runs-on: windows-latest  # Use Windows runner to support PowerShell commands
-
+  build-runspace:
+    runs-on: windows-latest
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '16'  # You can use the latest LTS version here
+      - name: Install Dependencies
+        run: |
+          npm install
+          
+      - name: Set Version to Today's Date
+        id: extract_version
+        run: |
+          $version = (Get-Date -Format "yy.MM.dd")
+          echo "VERSION=$version" >> $env:GITHUB_ENV
+        shell: pwsh
 
-    - name: Install dependencies
-      run: npm install
+      - name: Compile Extensions
+        run: |
+          npm run build  # Build for both Chrome and Firefox
 
-    - name: Build for Chrome and Firefox
-      run: npm run build  # Run your build script for both Chrome and Firefox
+      - name: Upload Chrome Extension as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: chrome-extension
+          path: ./dist/chrome
 
-    - name: Upload Chrome Extension to GitHub Releases (optional)
-      uses: actions/upload-artifact@v3
-      with:
-        name: chrome-extension
-        path: dist/chrome
+      - name: Upload Firefox Extension as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: firefox-extension
+          path: ./dist/firefox
 
-    - name: Upload Firefox Extension to GitHub Releases (optional)
-      uses: actions/upload-artifact@v3
-      with:
-        name: firefox-extension
-        path: dist/firefox
+      - name: Generate Release Notes
+        id: generate_notes
+        uses: release-drafter/release-drafter@v6
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          config-name: release-drafter.yml
+          version: ${{ env.VERSION }}
+
+      - name: Create and Upload Release
+        id: create_release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.VERSION }}
+          name: Pre-Release ${{ env.VERSION }}
+          body: |
+            ${{ steps.generate_notes.outputs.body }}
+
+            ![GitHub Downloads (specific asset, specific tag)](https://img.shields.io/github/downloads/Kxvin/motivision/${{ env.VERSION }}/chrome-extension)
+            ![GitHub Downloads (specific asset, specific tag)](https://img.shields.io/github/downloads/Kxvin/motivision/${{ env.VERSION }}/firefox-extension)
+          append_body: false
+          files: ./dist/chrome, ./dist/firefox  # Upload both Chrome and Firefox builds
+          prerelease: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
