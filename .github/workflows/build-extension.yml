@@ -6,54 +6,63 @@ permissions:
 
 on:
   workflow_dispatch: # Manual trigger
-  push:
-    branches:
-      - main
 
 jobs:
-  build-runspace:
+  release:
     runs-on: windows-latest
+
     steps:
+      # Checkout repository
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      # Install Dependencies
       - name: Install Dependencies
         run: npm install
 
+      # Set version dynamically
       - name: Set Version to Today's Date
-        id: extract_version
-        run: |
-          $version = (Get-Date -Format "yy.MM.dd")
-          echo "VERSION=$version" >> $env:GITHUB_ENV
-        shell: pwsh
+        id: set_version
+        run: echo "VERSION=$(date +'%y.%m.%d')" >> $GITHUB_ENV
+        shell: bash
 
-      - name: Build Chrome and Firefox Extensions
+      # Build Chrome and Firefox artifacts
+      - name: Build Chrome and Firefox
         run: npm run build
 
+      # Create Zip for Chrome
+      - name: Zip Chrome Extension
+        run: |
+          mkdir -p artifacts
+          powershell Compress-Archive -Path dist/chrome/* -DestinationPath artifacts/chrome-extension.zip
+
+      # Create Zip for Firefox
+      - name: Zip Firefox Extension
+        run: |
+          mkdir -p artifacts
+          powershell Compress-Archive -Path dist/firefox/* -DestinationPath artifacts/firefox-extension.zip
+
+      # Upload Zipped Chrome Artifact
       - name: Upload Chrome Extension as Artifact
         uses: actions/upload-artifact@v4
         with:
           name: chrome-extension
-          path: dist/chrome/**/*
+          path: artifacts/chrome-extension.zip
 
+      # Upload Zipped Firefox Artifact
       - name: Upload Firefox Extension as Artifact
         uses: actions/upload-artifact@v4
         with:
           name: firefox-extension
-          path: dist/firefox/**/*
+          path: artifacts/firefox-extension.zip
 
-      - name: Download Chrome Artifact
+      # Download artifacts to prepare for release
+      - name: Download Artifacts
         uses: actions/download-artifact@v4
         with:
-          name: chrome-extension
-          path: artifacts/chrome
+          path: artifacts/
 
-      - name: Download Firefox Artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: firefox-extension
-          path: artifacts/firefox
-
+      # Generate Release Notes
       - name: Generate Release Notes
         id: generate_notes
         uses: release-drafter/release-drafter@v6
@@ -63,21 +72,18 @@ jobs:
           config-name: release-drafter.yml
           version: ${{ env.VERSION }}
 
-      - name: Create and Upload Release
+      # Create GitHub Release
+      - name: Create Release
         id: create_release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ env.VERSION }}
-          name: Release ${{ env.VERSION }}
+          tag_name: v${{ env.VERSION }}
+          name: Release v${{ env.VERSION }}
           body: |
             ${{ steps.generate_notes.outputs.body }}
-
-            ![GitHub Downloads (Chrome)](https://img.shields.io/github/downloads/Kxvin/motivision/${{ env.VERSION }}/chrome-extension)
-            ![GitHub Downloads (Firefox)](https://img.shields.io/github/downloads/Kxvin/motivision/${{ env.VERSION }}/firefox-extension)
-          append_body: false
           files: |
-            artifacts/chrome/**/*  # Upload only the files downloaded as artifacts
-            artifacts/firefox/**/* # Upload only the files downloaded as artifacts
+            artifacts/chrome-extension.zip
+            artifacts/firefox-extension.zip
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
