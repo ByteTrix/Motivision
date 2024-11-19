@@ -3,11 +3,11 @@ name: Build and Release Extension
 on:
   push:
     branches:
-      - main  # Trigger on push to the main branch
+      - main  # Trigger the workflow on push to the main branch
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: windows-latest  # Use Windows runner to support PowerShell commands
 
     steps:
     - name: Checkout repository
@@ -16,90 +16,52 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: '16'
+        node-version: '16'  # Use the latest LTS version
 
     - name: Install dependencies
       run: npm install
 
     - name: Build for Chrome and Firefox
-      run: npm run build  # This should be your build script to create both Chrome and Firefox builds
+      run: npm run build  # Run your build script for both Chrome and Firefox
 
   release:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  # Use Linux runner for GitHub Release
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    - name: Get last tag version
-      id: get_last_tag
+    - name: Create a Tag
+      id: create_tag
       run: |
-        TAG=$(git describe --tags --abbrev=0 || echo "v0.0")  # Get the last tag, or default to v0.0 if none exists
-        echo "Last tag: $TAG"
-        echo "TAG=$TAG" >> $GITHUB_ENV
+        TAG_NAME="v$(date +'%Y%m%d%H%M%S')"  # You can customize the tag format
+        echo "Creating tag: $TAG_NAME"
+        git tag $TAG_NAME
+        git push origin $TAG_NAME
 
-    - name: Increment version
-      id: increment_version
-      run: |
-        VERSION=${{ env.TAG }}
-        VERSION=${VERSION#v}  # Remove "v" prefix if it exists
-        IFS='.' read -r -a version_parts <<< "$VERSION"  # Split version into parts
-        major=${version_parts[0]}
-        minor=${version_parts[1]}
-        patch=${version_parts[2]:-0}
-
-        # Increment patch version
-        patch=$((patch + 1))
-        new_version="v${major}.${minor}.${patch}"  # Set patch version to incremented value
-        echo "New version: $new_version"
-        echo "NEW_VERSION=$new_version" >> $GITHUB_ENV
-
-    - name: Fetch tags
-      run: git fetch --tags  # Ensure the tags are fetched from the remote repository
-
-    - name: Check if tag exists
-      id: check_tag
-      run: |
-        echo "Checking if tag v${{ env.NEW_VERSION }} exists..."
-        if git rev-parse "v${{ env.NEW_VERSION }}" >/dev/null 2>&1; then
-          echo "Tag v${{ env.NEW_VERSION }} already exists, skipping creation."
-          echo "EXISTING_TAG=true" >> $GITHUB_ENV
-        else
-          echo "Tag v${{ env.NEW_VERSION }} does not exist, creating new tag."
-          echo "EXISTING_TAG=false" >> $GITHUB_ENV
-        fi
-
-    - name: Delete existing tag if necessary
-      if: env.EXISTING_TAG == 'true'
-      run: |
-        echo "Deleting existing tag v${{ env.NEW_VERSION }}"
-        git tag -d "v${{ env.NEW_VERSION }}"  # Delete the local tag
-        git push origin --delete "v${{ env.NEW_VERSION }}"  # Delete the remote tag
-
-    - name: Create and push new tag
-      if: env.EXISTING_TAG == 'false'
-      run: |
-        echo "Creating new tag: ${{ env.NEW_VERSION }}"
-        git tag ${{ env.NEW_VERSION }}  # Create the tag locally
-        git push origin ${{ env.NEW_VERSION }}  # Push the tag to the remote repository
+    - name: Create GitHub Release
+      id: create_release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          dist/chrome/*
+          dist/firefox/*
 
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Verify the tag for release
-      run: |
-        echo "Tag for release: ${{ env.NEW_VERSION }}"
-        git fetch --tags
-        git tag -l  # List all tags to verify the new tag is present
-
-    - name: Create GitHub Release
-      if: env.EXISTING_TAG == 'false'  # Ensure this runs only if a new tag was created
+    - name: Upload Chrome Extension to GitHub Release
       uses: softprops/action-gh-release@v1
       with:
-        tag_name: ${{ env.NEW_VERSION }}  # Explicitly pass the tag to the release action
-        files: |
-          dist/chrome/*
-          dist/firefox/*
+        files: dist/chrome/*
+
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Upload Firefox Extension to GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: dist/firefox/*
 
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
