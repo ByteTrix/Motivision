@@ -6,6 +6,9 @@ permissions:
 
 on:
   workflow_dispatch: # Manual trigger
+  push:
+    branches:
+      - main
 
 jobs:
   release:
@@ -33,14 +36,14 @@ jobs:
       # Create Zip for Chrome
       - name: Zip Chrome Extension
         run: |
-          mkdir -p artifacts
-          powershell Compress-Archive -Path dist/chrome/* -DestinationPath artifacts/chrome-extension.zip
+          if (-not (Test-Path "artifacts")) { New-Item -ItemType Directory -Force -Path "artifacts" }
+          Compress-Archive -Path dist/chrome/* -DestinationPath artifacts/chrome-extension.zip
 
       # Create Zip for Firefox
       - name: Zip Firefox Extension
         run: |
-          mkdir -p artifacts
-          powershell Compress-Archive -Path dist/firefox/* -DestinationPath artifacts/firefox-extension.zip
+          if (-not (Test-Path "artifacts")) { New-Item -ItemType Directory -Force -Path "artifacts" }
+          Compress-Archive -Path dist/firefox/* -DestinationPath artifacts/firefox-extension.zip
 
       # Upload Zipped Chrome Artifact
       - name: Upload Chrome Extension as Artifact
