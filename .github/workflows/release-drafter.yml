@@ -3,24 +3,23 @@ name: Release Drafter
 on:
   push:
     branches:
-      - main  # Or use 'master' or another branch name
+      - main  # Use the correct branch
     tags:
-      - 'v*'  # This triggers when a new version tag is pushed
+      - 'v*'  # Use tag-based releases
 
 jobs:
   draft_release:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set up Release Drafter
         uses: release-drafter/release-drafter@v6
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # GitHub token for authentication
         with:
           config-name: release-drafter.yml
-          version: ${{ github.ref }}  # You can adjust this depending on your versioning system
+          version: ${{ github.ref }}  # The version will be based on the tag, like 'v1.0.0'
           template: |
             ## What's Changed
-            ${{changelog}}
+            - Added new feature
