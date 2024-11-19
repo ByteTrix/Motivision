@@ -41,6 +41,18 @@ jobs:
           name: firefox-extension
           path: dist/firefox/**/*
 
+      - name: Download Chrome Extension Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: chrome-extension
+          path: artifacts/chrome # Artifacts are saved to this location for release
+
+      - name: Download Firefox Extension Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: firefox-extension
+          path: artifacts/firefox # Artifacts are saved to this location for release
+
       - name: Generate Release Notes
         id: generate_notes
         uses: release-drafter/release-drafter@v6
@@ -63,8 +75,8 @@ jobs:
             ![GitHub Downloads (specific asset, specific tag)](https://img.shields.io/github/downloads/Kxvin/motivision/${{ env.VERSION }}/firefox-extension)
           append_body: false
           files: |
-            dist/chrome/**/* 
-            dist/firefox/**/* # Correctly specifying both paths
-          prerelease: false # This ensures it's a normal release
+            artifacts/chrome/**/* 
+            artifacts/firefox/**/* # Include downloaded artifacts in the release
+          prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
