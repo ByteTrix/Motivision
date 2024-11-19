@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
     - name: Checkout repository
@@ -48,16 +48,16 @@ jobs:
         minor=${version_parts[1]}
         patch=${version_parts[2]:-0}
 
-        # Increment minor version
-        minor=$((minor + 1))
-        new_version="v${major}.${minor}.0"  # Set patch version to 0
+        # Increment patch version
+        patch=$((patch + 1))
+        new_version="v${major}.${minor}.${patch}"  # Set patch version to incremented value
         echo "New version: $new_version"
         echo "NEW_VERSION=$new_version" >> $GITHUB_ENV
 
     - name: Create and push tag
       run: |
         echo "Creating tag: ${{ env.NEW_VERSION }}"
-        git tag ${{ env.NEW_VERSION }}
+        git tag ${{ env.NEW_VERSION }}  # Create a new tag locally
         git push origin ${{ env.NEW_VERSION }}  # Push the tag to the repository
 
       env:
@@ -72,19 +72,3 @@ jobs:
 
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Ensure the token has write permissions to push and create releases
-
-    - name: Upload Chrome Extension to GitHub Release
-      uses: softprops/action-gh-release@v1
-      with:
-        files: dist/chrome/*
-
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: Upload Firefox Extension to GitHub Release
-      uses: softprops/action-gh-release@v1
-      with:
-        files: dist/firefox/*
-
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
