@@ -23,11 +23,16 @@ jobs:
       - name: Get current version
         id: get_version
         run: |
-          latest_tag=$(git describe --tags --abbrev=0)
+          # Try to get the latest tag
+          latest_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
           echo "Latest tag: $latest_tag"
+          
+          # If no tag is found, default to v1.0.0
           if [ -z "$latest_tag" ]; then
+            echo "No tags found. Starting with v1.0.0"
             echo "::set-output name=tag::v1.0.0"
           else
+            # Increment the tag number
             version_number=$(echo $latest_tag | sed 's/v//')
             new_version_number=$((version_number + 1))
             new_tag="v$new_version_number"
