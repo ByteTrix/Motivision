@@ -3,10 +3,7 @@ name: Build and Release Extension
 on:
   push:
     branches:
-      - main  # Trigger the workflow on push to the main branch
-  pull_request:
-    branches:
-      - main  # Trigger the workflow on PR to the main branch
+      - main  # Trigger on push to the main branch
 
 jobs:
   build:
@@ -19,7 +16,7 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: '16'  # You can use the latest LTS version here
+        node-version: '16'  # Use the latest LTS version
 
     - name: Install dependencies
       run: npm install
@@ -34,7 +31,37 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    - name: Create Release
+    - name: Get last tag version
+      id: get_last_tag
+      run: |
+        TAG=$(git describe --tags --abbrev=0 || echo "v0.0")  # Fetch the last tag or default to v0.0
+        echo "Last tag: $TAG"
+        echo "TAG=$TAG" >> $GITHUB_ENV
+
+    - name: Increment version
+      id: increment_version
+      run: |
+        VERSION=${{ env.TAG }}
+        VERSION=${VERSION#v}  # Remove "v" prefix if it exists
+        IFS='.' read -r -a version_parts <<< "$VERSION"  # Split version into parts
+        major=${version_parts[0]}
+        minor=${version_parts[1]}
+        patch=${version_parts[2]:-0}
+
+        # Increment minor version by 1
+        minor=$((minor + 1))
+        new_version="v${major}.${minor}.0"  # Reset patch version to 0
+        echo "New version: $new_version"
+        echo "NEW_VERSION=$new_version" >> $GITHUB_ENV
+
+    - name: Create a Tag
+      id: create_tag
+      run: |
+        echo "Creating tag: ${{ env.NEW_VERSION }}"
+        git tag ${{ env.NEW_VERSION }}
+        git push origin ${{ env.NEW_VERSION }}
+
+    - name: Create GitHub Release
       id: create_release
       uses: softprops/action-gh-release@v1
       with:
