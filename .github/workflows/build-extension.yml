@@ -6,6 +6,9 @@ permissions:
 
 on:
   workflow_dispatch: # Manual trigger
+  push:
+    branches:
+      - main
 
 jobs:
   build-runspace:
@@ -45,13 +48,13 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: chrome-extension
-          path: artifacts/chrome # Artifacts are saved to this location for release
+          path: artifacts/chrome
 
       - name: Download Firefox Extension Artifact
         uses: actions/download-artifact@v4
         with:
           name: firefox-extension
-          path: artifacts/firefox # Artifacts are saved to this location for release
+          path: artifacts/firefox
 
       - name: Generate Release Notes
         id: generate_notes
@@ -76,7 +79,7 @@ jobs:
           append_body: false
           files: |
             artifacts/chrome/**/* 
-            artifacts/firefox/**/* # Include downloaded artifacts in the release
+            artifacts/firefox/**/* # Ensure the pattern matches downloaded files
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
