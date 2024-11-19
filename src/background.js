@@ -3,58 +3,31 @@ chrome.runtime.onInstalled.addListener(() => {
 });
 
 async function fetchImageAndQuote() {
-  const apiUrl = "https://motivision.vercel.app/api/handler.js";  // Vercel-hosted API URL for the image
+  // Updated API URLs
+  const UNSPLASH_API_URL = "https://motivision.vercel.app/api/handler.js";  // Vercel-hosted API for image
+  const QUOTE_API_URL = "https://api.quotable.io/random?tags=motivational";  // Existing quote API
 
   try {
-    // Fetch image URL from the Vercel API
-    const response = await fetch(apiUrl);
-    const data = await response.json();
+    // Fetch image and quote in parallel
+    const [imageData, quoteData] = await Promise.all([
+      fetch(UNSPLASH_API_URL).then(res => res.json()),  // Fetch image from Vercel API
+      fetch(QUOTE_API_URL).then(res => res.json())     // Fetch quote from quotable.io API
+    ]);
 
-    if (data && data.imageUrl) {
-      const imageUrl = data.imageUrl;
+    // Assuming the Vercel API responds with an imageUrl field
+    const fullImageUrl = imageData.imageUrl;  
+    const quote = quoteData.content;
+    const author = quoteData.author;
 
-      // Fetch a motivational quote
-      const quoteData = await fetchQuote();
+    // Store the fetched image and quote in Chrome storage
+    chrome.storage.local.set({
+      backgroundImage: fullImageUrl,
+      quote: quote,
+      author: author
+    });
 
-      if (quoteData) {
-        const quote = quoteData.content;
-        const author = quoteData.author;
-
-        // Store the fetched image, quote, and author in Chrome's local storage
-        chrome.storage.local.set({
-          backgroundImage: imageUrl,
-          quote: quote,
-          author: author
-        });
-
-        console.log("Fetched and stored image and quote successfully.");
-      } else {
-        console.error("Quote fetch failed.");
-      }
-    } else {
-      console.error("Image fetch failed: No image URL in the response.");
-    }
+    console.log("Fetched and stored new image and quote successfully.");
   } catch (error) {
     console.error("Error fetching image and quote:", error);
   }
-}
-
-// Fetch a motivational quote from quotable.io API
-async function fetchQuote() {
-  const QUOTE_API_URL = "https://api.quotable.io/random?tags=motivational";
-
-  try {
-    const response = await fetch(QUOTE_API_URL);
-    const data = await response.json();
-
-    if (data) {
-      return data; // Return quote data
-    } else {
-      console.error("Quote data not found.");
-    }
-  } catch (error) {
-    console.error("Error fetching quote:", error);
-  }
-
-  return null; // Return null if quote fetch fails
 }

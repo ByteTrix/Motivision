@@ -1,4 +1,3 @@
-// api/handler.js
 export default async function handler(req, res) {
   // Add CORS headers to allow requests from any origin
   res.setHeader('Access-Control-Allow-Origin', '*');  // Allow all origins
@@ -42,7 +41,7 @@ export default async function handler(req, res) {
       return res.status(404).json({ error: "No image found from Unsplash" });
     }
 
-    const fullImageUrl = imageData[0].urls.regular;  // Use 'regular' for faster load
+    const fullImageUrl = imageData[0].urls.full;  // Use 'regular' for faster load
     console.log("Returning image URL:", fullImageUrl);
 
     // Return the image URL to the client

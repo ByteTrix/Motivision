@@ -7,9 +7,9 @@ document.addEventListener("DOMContentLoaded", function () {
   // Show the loader initially
   loader.style.display = 'block';
 
-  // Fetch and display stored content first, then update in the background
+  // Display stored content and fetch new data in the background
   chrome.storage.local.get(['backgroundImage', 'quote', 'author'], function (data) {
-    // Display stored background image
+    // Display stored image
     if (data.backgroundImage) {
       document.body.style.backgroundImage = `url(${data.backgroundImage})`;
     } else {
@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", function () {
       console.log("No stored image found, applying fallback color.");
     }
 
-    // Display stored quote and author
+    // Display stored quote
     if (data.quote && data.author) {
       quoteElement.textContent = `"${data.quote}"`;
       authorElement.textContent = `- ${data.author}`;
@@ -28,62 +28,47 @@ document.addEventListener("DOMContentLoaded", function () {
       console.log("No stored quote found, displaying placeholder message.");
     }
 
-    // Hide the loader and display the content
+    // Hide the loader and show the content
     loader.style.display = 'none';
     quoteContainer.style.display = 'block';
 
     // Fetch new image and quote in the background
-    fetchImageAndQuote();
+    fetchImage();
+    fetchQuote();
   });
 
-  // Fetch new background image and quote in the background
-  async function fetchImageAndQuote() {
-    const apiUrl = "https://motivision.vercel.app/api/handler.js"; // URL to Vercel-hosted API for the image
+  // Fetch and store a new image
+  async function fetchImage() {
+    const UNSPLASH_API_URL = "https://motivision.vercel.app/api/handler.js";  // Updated URL to your Vercel-hosted API
 
+    console.log("Fetching new image...");
     try {
-      // Fetch the background image URL
-      const response = await fetch(apiUrl);
-      const data = await response.json();
+      const imageData = await fetch(UNSPLASH_API_URL).then(res => res.json());
+      const fullImageUrl = imageData.imageUrl;
 
-      if (data && data.imageUrl) {
-        const imageUrl = data.imageUrl;
-        chrome.storage.local.set({ backgroundImage: imageUrl }); // Store new image URL
-        document.body.style.backgroundImage = `url(${imageUrl})`; // Update background image
-        console.log("Fetched and stored new image URL.");
-      } else {
-        console.error("No image URL found in API response.");
-      }
-
-      // Fetch and store a new motivational quote
-      await fetchQuote();
+      chrome.storage.local.set({ backgroundImage: fullImageUrl });
+      console.log("Fetched and stored new image URL.");
     } catch (error) {
-      console.error("Error fetching image and quote:", error);
+      console.error("Error fetching image:", error);
     }
   }
 
-  // Fetch a new motivational quote from quotable.io
+  // Fetch and store a new quote
   async function fetchQuote() {
     const QUOTE_API_URL = "https://api.quotable.io/random?tags=motivational";
 
+    console.log("Fetching new quote...");
     try {
-      const response = await fetch(QUOTE_API_URL);
-      const quoteData = await response.json();
+      const quoteData = await fetch(QUOTE_API_URL).then(res => res.json());
+      const newQuote = quoteData.content;
+      const newAuthor = quoteData.author;
 
-      if (quoteData) {
-        const newQuote = quoteData.content;
-        const newAuthor = quoteData.author;
-        chrome.storage.local.set({
-          quote: newQuote,
-          author: newAuthor,
-        });
+      chrome.storage.local.set({
+        quote: newQuote,
+        author: newAuthor,
+      });
 
-        console.log(`Fetched and stored new quote: "${newQuote}" by ${newAuthor}`);
-        // Update quote on the page after fetching a new one
-        quoteElement.textContent = `"${newQuote}"`;
-        authorElement.textContent = `- ${newAuthor}`;
-      } else {
-        console.error("Failed to fetch quote.");
-      }
+      console.log(`Fetched and stored new quote: "${newQuote}" by ${newAuthor}`);
     } catch (error) {
       console.error("Error fetching quote:", error);
     }
