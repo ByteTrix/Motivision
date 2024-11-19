@@ -1,28 +1,58 @@
-// Fetch motivational quote from Quotable API with specific parameters
-const quoteElement = document.getElementById('quote');
-
-function getMotivationalQuote() {
-  const apiUrl = 'https://api.quotable.io/quotes/random?tags=motivational&limit=1';  // Change tags or other parameters as needed
+document.addEventListener("DOMContentLoaded", function () {
+  // Unsplash API endpoint
+  const UNSPLASH_API_URL = "https://api.unsplash.com/photos/random?client_id=mpBdvwJCIICVEIAKoEWhpoqCNbbc-lh2Xa7UDog_-Ro&count=1&query=nature&orientation=landscape";
   
-  fetch(apiUrl)
+  // Quotable API endpoint
+  const QUOTE_API_URL = "https://api.quotable.io/random?tags=motivational";
+
+  // Fetch background image from Unsplash
+  fetch(UNSPLASH_API_URL)
     .then(response => response.json())
     .then(data => {
-      // The API response is an array, so access the first element
-      const quoteData = data[0]; // Access the first quote from the array
+      const imageUrl = data[0].urls.full;  // Get the full-size image URL
+      const imageColor = data[0].color;    // Get the image background color
 
-      // Extract quote text and author
-      const quoteText = `"${quoteData.content}"`;
-      const author = `— ${quoteData.author}`;
-
-      // Update the quote and author in the HTML
-      quoteElement.innerHTML = `${quoteText}<br><span class="author">${author}</span>`;
+      // Set background image and color
+      document.body.style.backgroundImage = `url(${imageUrl})`;
+      document.body.style.backgroundColor = imageColor || '#000'; // Fallback color
+      document.body.style.backgroundSize = 'cover';
+      document.body.style.backgroundPosition = 'center';
+      document.body.style.height = '100vh';
+      document.body.style.margin = '0';
+      document.body.style.display = 'flex';
+      document.body.style.flexDirection = 'column';
+      document.body.style.justifyContent = 'center';
+      document.body.style.alignItems = 'center';
     })
     .catch(error => {
-      // Fallback message in case of error
-      quoteElement.innerHTML = "Stay motivated! Keep going!";
-      console.error('Error fetching quote:', error);
+      console.error("Error fetching Unsplash image:", error);
+      // Fallback background if error occurs
+      document.body.style.backgroundColor = '#333';
     });
-}
 
-// Load the quote when the page loads
-getMotivationalQuote();
+  // Fetch quote from Quotable API
+  fetch(QUOTE_API_URL)
+    .then(response => response.json())
+    .then(data => {
+      const quoteText = data.content;
+      const author = data.author;
+
+      // Display the quote and author in the UI
+      const quoteElement = document.getElementById("quote");
+      const authorElement = document.getElementById("author");
+      if (quoteElement && authorElement) {
+        quoteElement.textContent = `"${quoteText}"`;
+        authorElement.textContent = `- ${author}`;
+      }
+    })
+    .catch(error => {
+      console.error("Error fetching quote:", error);
+      // Display fallback quote if error occurs
+      const quoteElement = document.getElementById("quote");
+      const authorElement = document.getElementById("author");
+      if (quoteElement && authorElement) {
+        quoteElement.textContent = `"Keep pushing forward, no matter what."`;
+        authorElement.textContent = `- Anonymous`;
+      }
+    });
+});

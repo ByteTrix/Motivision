@@ -1,0 +1,141 @@
+/* Reset styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Body styles */
+body {
+  font-family: 'Roboto', Arial, sans-serif;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+  background-color: #121212;
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  overflow: hidden;
+  text-align: center;
+  background-image: url(''); /* The background image will be set dynamically */
+}
+
+/* Quote container */
+#quote-container {
+  max-width: 800px;
+  width: 90%;
+  padding: 40px 50px; /* Adjust padding */
+  background: rgba(0, 0, 0, 0.7);  /* Dark background for better contrast */
+  border-radius: 15px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(12px);  /* Smooth blur effect for the background */
+  transition: box-shadow 0.3s ease;
+  position: relative;
+}
+
+/* Quote text */
+#quote {
+  font-size: 28px; /* Adjust font size */
+  font-weight: 400;
+  color: #fff;
+  line-height: 1.6;
+  margin-bottom: 15px;
+  font-style: italic;
+  letter-spacing: 0.5px;
+  text-align: center;
+}
+
+/* Author text */
+#author {
+  font-size: 14px; /* Adjust font size */
+  color: #e5e5e5;
+  font-weight: 300;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  opacity: 0.8;
+  position: absolute;
+  bottom: 15px;
+  right: 20px;
+}
+
+/* Credits container (aligned to bottom left corner) */
+#credits {
+  text-align: left;
+  font-size: 7px; /* Adjust font size */
+  color: #e5e5e5;
+  position: absolute;
+  bottom: 15px; /* Align to bottom */
+  left: 15px;  /* Align to left */
+  font-weight: 200;
+  letter-spacing: 0.5px;
+  white-space: nowrap;  /* Ensure everything stays on one line */
+}
+
+#credits a {
+  color: #e5e5e5;
+  text-decoration: none;
+}
+
+/* Made with ❤️ by Kxvin styling */
+#made-by {
+  font-size: 10px; /* Adjust font size */
+  color: #e5e5e5;
+  position: absolute;
+  bottom: 15px;
+  right: 15px; /* Align it to the right corner */
+  font-weight: 200;
+  letter-spacing: 0.5px;
+}
+
+#made-by span {
+  font-weight: bold;
+}
+
+/* Mobile responsiveness */
+@media screen and (max-width: 768px) {
+  body {
+    background-attachment: scroll;  /* For mobile devices */
+  }
+  #quote-container {
+    padding: 30px 40px;
+  }
+  #quote {
+    font-size: 24px;  /* Adjust font size */
+  }
+  #author {
+    font-size: 12px;
+  }
+  #credits {
+    font-size: 10px;
+    bottom: 10px;
+  }
+  #made-by {
+    font-size: 10px;
+    bottom: 10px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  body {
+    background-attachment: scroll;
+  }
+  #quote-container {
+    padding: 20px 30px;
+  }
+  #quote {
+    font-size: 20px;  /* Adjust font size */
+  }
+  #author {
+    font-size: 12px;
+  }
+  #credits {
+    font-size: 8px;
+    bottom: 8px;
+  }
+  #made-by {
+    font-size: 8px;
+    bottom: 8px;
+  }
+}
