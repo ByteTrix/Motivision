@@ -1,4 +1,4 @@
-name: Build Extension
+name: Build and Release Extension
 
 on:
   push:
@@ -27,14 +27,36 @@ jobs:
     - name: Build for Chrome and Firefox
       run: npm run build  # Run your build script for both Chrome and Firefox
 
-    - name: Upload Chrome Extension to GitHub Releases (optional)
-      uses: actions/upload-artifact@v3
-      with:
-        name: chrome-extension
-        path: dist/chrome
+  release:
+    runs-on: ubuntu-latest  # Use Linux runner for GitHub Release
 
-    - name: Upload Firefox Extension to GitHub Releases (optional)
-      uses: actions/upload-artifact@v3
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Create Release
+      id: create_release
+      uses: softprops/action-gh-release@v1
       with:
-        name: firefox-extension
-        path: dist/firefox
+        files: |
+          dist/chrome/*
+          dist/firefox/*
+
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Upload Chrome Extension to GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: dist/chrome/*
+
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Upload Firefox Extension to GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: dist/firefox/*
+
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
