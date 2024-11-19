@@ -1,74 +1,77 @@
 name: Build and Release Extension
 
 on:
-  push:
-    branches:
-      - main  # Trigger on push to the main branch
+ push:
+ branches:
+ - main # Trigger on push to the main branch
 
 jobs:
-  build:
-    runs-on: windows-latest
+ build:
+ runs-on: windows-latest
 
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+ steps:
+ - name: Checkout repository
+ uses: actions/checkout@v3
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '16'
+ - name: Set up Node.js
+ uses: actions/setup-node@v3
+ with:
+ node-version: '16'
 
-    - name: Install dependencies
-      run: npm install
+ - name: Install dependencies
+ run: npm install
 
-    - name: Build for Chrome and Firefox
-      run: npm run build  # This should be your build script to create both Chrome and Firefox builds
+ - name: Build for Chrome and Firefox
+ run: npm run build # This should be your build script to create both Chrome and Firefox builds
 
-  release:
-    runs-on: ubuntu-latest
+ release:
+ runs-on: ubuntu-latest
 
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+ steps:
+ - name: Checkout repository
+ uses: actions/checkout@v3
 
-    - name: Get last tag version
-      id: get_last_tag
-      run: |
-        TAG=$(git describe --tags --abbrev=0 || echo "v0.0")  # Get the last tag, or default to v0.0 if none exists
-        echo "Last tag: $TAG"
-        echo "TAG=$TAG" >> $GITHUB_ENV
+ - name: Get last tag version
+ id: get_last_tag
+ run: |
+TAG=$(git describe --tags --abbrev=0 || echo "v0.0") # Get the last tag, or default to v0.0 if none exists
+ echo "Last tag: $TAG"
+echo "TAG=$TAG" >> $GITHUB_ENV
 
-    - name: Increment version
-      id: increment_version
-      run: |
-        VERSION=${{ env.TAG }}
-        VERSION=${VERSION#v}  # Remove "v" prefix if it exists
-        IFS='.' read -r -a version_parts <<< "$VERSION"  # Split version into parts
-        major=${version_parts[0]}
-        minor=${version_parts[1]}
-        patch=${version_parts[2]:-0}
+ - name: Increment version
+ id: increment_version
+ run: |
+VERSION=${{ env.TAG }}
+VERSION=${VERSION#v} # Remove "v" prefix if it exists
+IFS='.' read -r -a version_parts <<< "$VERSION" # Split version into parts
+major=${version_parts[0]}
+minor=${version_parts[1]}
+patch=${version_parts[2]:-0}
 
-        # Increment patch version
-        patch=$((patch + 1))
-        new_version="v${major}.${minor}.${patch}"  # Set patch version to incremented value
-        echo "New version: $new_version"
-        echo "NEW_VERSION=$new_version" >> $GITHUB_ENV
+ # Increment patch version
+patch=$((patch + 1))
+new_version="v${major}.${minor}.${patch}" # Set patch version to incremented value
+ echo "New version: $new_version"
+echo "NEW_VERSION=$new_version" >> $GITHUB_ENV
 
-    - name: Create and push tag
-      run: |
-        echo "Creating tag: ${{ env.NEW_VERSION }}"
-        git tag ${{ env.NEW_VERSION }}  # Create a new tag locally
-        git push origin ${{ env.NEW_VERSION }}  # Push the tag to the repository
+ - name: Create and push tag
+ run: |
+ echo "Creating tag: ${{ env.NEW_VERSION }}"
+git tag ${{ env.NEW_VERSION }} # Create a new tag locally
+git push origin ${{ env.NEW_VERSION }} # Push the tag to the repository
 
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+ env:
+ GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Create GitHub Release
-      uses: softprops/action-gh-release@v1
-      with:
-        files: |
-          dist/chrome/*
-          dist/firefox/*
+ - name: Fetch tags
+ run: git fetch --tags # Ensure the tags are fetched before creating the release
 
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Ensure the token has write permissions to push and create releases
+ - name: Create GitHub Release
+ uses: softprops/action-gh-release@v1
+ with:
+ files: |
+dist/chrome/*
+dist/firefox/*
+
+ env:
+ GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Ensure the token has write permissions to push and create releases
