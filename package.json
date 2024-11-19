@@ -14,8 +14,8 @@
     "build:chrome:files": "copyfiles -u 1 src\\* dist\\chrome && del dist\\chrome\\manifest.firefox.json",
     "build:firefox:files": "copyfiles -u 1 src\\* dist\\firefox && del dist\\firefox\\manifest.chrome.json",
 
-    "build:chrome:icons": "copyfiles -u 1 src\\icons\\* dist\\chrome\\icons",
-    "build:firefox:icons": "copyfiles -u 1 src\\icons\\* dist\\firefox\\icons",
+    "build:chrome:icons": "copyfiles -u 1 src\\icons\\* dist\\chrome",
+    "build:firefox:icons": "copyfiles -u 1 src\\icons\\* dist\\firefox",
 
     "build:chrome:rename-manifest": "move dist\\chrome\\manifest.chrome.json dist\\chrome\\manifest.json",
     "build:firefox:rename-manifest": "move dist\\firefox\\manifest.firefox.json dist\\firefox\\manifest.json",
