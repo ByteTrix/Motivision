@@ -1,10 +1,9 @@
 {
-  "name": "newtab",
+  "name": "motivision",
   "version": "1.0.0",
-  "keywords": [],
-  "author": "",
+  "author": "Kxvin",
   "license": "ISC",
-  "description": "",
+  "description": "A minimal new tab where Motivation meets Minimalism.",
   "scripts": {
     "build:chrome": "npm-run-all build:chrome:files",
     "build:firefox": "npm-run-all build:firefox:files",
