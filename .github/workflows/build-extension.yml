@@ -54,10 +54,13 @@ jobs:
         echo "New version: $new_version"
         echo "NEW_VERSION=$new_version" >> $GITHUB_ENV
 
+    - name: Fetch tags
+      run: git fetch --tags  # Ensure the tags are fetched from the remote repository
+
     - name: Check if tag exists
       id: check_tag
       run: |
-        git fetch --tags  # Fetch the tags from remote
+        git fetch --tags  # Fetch tags from remote
         if git rev-parse "v${{ env.NEW_VERSION }}" >/dev/null 2>&1; then
           echo "Tag v${{ env.NEW_VERSION }} already exists, skipping creation."
           echo "EXISTING_TAG=true" >> $GITHUB_ENV
@@ -77,14 +80,11 @@ jobs:
       if: env.EXISTING_TAG == 'false'
       run: |
         echo "Creating new tag: ${{ env.NEW_VERSION }}"
-        git tag ${{ env.NEW_VERSION }}  # Create a new tag locally
-        git push origin ${{ env.NEW_VERSION }}  # Push the tag to the repository
+        git tag ${{ env.NEW_VERSION }}  # Create the tag locally
+        git push origin ${{ env.NEW_VERSION }}  # Push the tag to the remote repository
 
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: Fetch tags
-      run: git fetch --tags  # Ensure the tags are fetched before creating the release
 
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v1
