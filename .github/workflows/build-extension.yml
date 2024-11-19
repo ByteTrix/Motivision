@@ -25,26 +25,6 @@ jobs:
           echo "VERSION=$version" >> $env:GITHUB_ENV
         shell: pwsh
 
-      - name: Create Directories for Chrome and Firefox
-        run: |
-          New-Item -ItemType Directory -Force -Path dist\chrome
-          New-Item -ItemType Directory -Force -Path dist\firefox
-        shell: pwsh
-
-      - name: Copy Files to Chrome and Firefox Folders
-        run: |
-          Copy-Item -Recurse -Path src\* -Destination dist\chrome
-          Copy-Item -Recurse -Path src\* -Destination dist\firefox
-        shell: pwsh
-
-      - name: Rename manifest files for Chrome and Firefox
-        run: |
-          # Rename for Chrome
-          Rename-Item -Path dist\chrome\manifest.chrome.json -NewName dist\chrome\manifest.json
-          # Rename for Firefox
-          Rename-Item -Path dist\firefox\manifest.firefox.json -NewName dist\firefox\manifest.json
-        shell: pwsh
-
       - name: Upload Chrome Extension as artifact
         uses: actions/upload-artifact@v4
         with:

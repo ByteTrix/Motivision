@@ -7,14 +7,19 @@
   "scripts": {
     "build:chrome": "npm-run-all build:chrome:create-dir build:chrome:files build:chrome:icons build:chrome:rename-manifest",
     "build:firefox": "npm-run-all build:firefox:create-dir build:firefox:files build:firefox:icons build:firefox:rename-manifest",
-    "build:chrome:create-dir": "mkdir -p dist/chrome",
-    "build:firefox:create-dir": "mkdir -p dist/firefox",
-    "build:chrome:files": "copyfiles -u 1 src/* dist/chrome",
-    "build:firefox:files": "copyfiles -u 1 src/* dist/firefox",
-    "build:chrome:icons": "copyfiles -u 1 src/icons/* dist/chrome/icons",
-    "build:firefox:icons": "copyfiles -u 1 src/icons/* dist/firefox/icons",
-    "build:chrome:rename-manifest": "move dist/chrome/manifest.chrome.json dist/chrome/manifest.json",
-    "build:firefox:rename-manifest": "move dist/firefox/manifest.firefox.json dist/firefox/manifest.json",
+    
+    "build:chrome:create-dir": "if not exist dist\\chrome mkdir dist\\chrome",
+    "build:firefox:create-dir": "if not exist dist\\firefox mkdir dist\\firefox",
+
+    "build:chrome:files": "copyfiles -u 1 src\\* dist\\chrome && del dist\\chrome\\manifest.firefox.json",
+    "build:firefox:files": "copyfiles -u 1 src\\* dist\\firefox && del dist\\firefox\\manifest.chrome.json",
+
+    "build:chrome:icons": "copyfiles -u 1 src\\icons\\* dist\\chrome\\icons",
+    "build:firefox:icons": "copyfiles -u 1 src\\icons\\* dist\\firefox\\icons",
+
+    "build:chrome:rename-manifest": "move dist\\chrome\\manifest.chrome.json dist\\chrome\\manifest.json",
+    "build:firefox:rename-manifest": "move dist\\firefox\\manifest.firefox.json dist\\firefox\\manifest.json",
+    
     "build": "npm-run-all build:chrome build:firefox"
   },
   "devDependencies": {
