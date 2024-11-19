@@ -3,7 +3,7 @@ chrome.runtime.onInstalled.addListener(() => {
 });
 
 async function fetchImageAndQuote() {
-  const apiUrl = "https://your-vercel-url.com/api/handler";  // Replace with your server's URL for the image
+  const apiUrl = "https://motivision.vercel.app/api/handler";  // Replace with your server's URL for the image
 
   try {
     // Fetch the image URL from the server-side handler

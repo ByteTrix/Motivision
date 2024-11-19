@@ -9,6 +9,7 @@
         "src": "api/handler.js",
         "use": "@vercel/node"
       }
-    ]
+    ],
+  "outputDirectory": "dist"
   }
   

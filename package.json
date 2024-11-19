@@ -5,10 +5,14 @@
   "license": "ISC",
   "description": "A minimal new tab where Motivation meets Minimalism.",
   "scripts": {
-    "build:chrome": "npm-run-all build:chrome:files",
-    "build:firefox": "npm-run-all build:firefox:files",
+    "build:chrome": "npm-run-all build:chrome:create-dir build:chrome:files build:chrome:rename-manifest",
+    "build:firefox": "npm-run-all build:firefox:create-dir build:firefox:files build:firefox:rename-manifest",
+    "build:chrome:create-dir": "mkdir dist\\chrome || echo 'Directory exists'",
+    "build:firefox:create-dir": "mkdir dist\\firefox || echo 'Directory exists'",
     "build:chrome:files": "copyfiles -u 1 src/* dist/chrome",
     "build:firefox:files": "copyfiles -u 1 src/* dist/firefox",
+    "build:chrome:rename-manifest": "powershell Move-Item -Path dist\\chrome\\manifest.chrome.json -Destination dist\\chrome\\manifest.json",
+    "build:firefox:rename-manifest": "powershell Move-Item -Path dist\\firefox\\manifest.firefox.json -Destination dist\\firefox\\manifest.json",
     "build": "npm-run-all build:chrome build:firefox"
   },
   "devDependencies": {
