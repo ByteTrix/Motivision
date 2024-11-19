@@ -5,14 +5,16 @@
   "license": "ISC",
   "description": "A minimal new tab where Motivation meets Minimalism.",
   "scripts": {
-    "build:chrome": "npm-run-all build:chrome:create-dir build:chrome:files build:chrome:rename-manifest",
-    "build:firefox": "npm-run-all build:firefox:create-dir build:firefox:files build:firefox:rename-manifest",
-    "build:chrome:create-dir": "mkdir dist\\chrome || echo 'Directory exists'",
-    "build:firefox:create-dir": "mkdir dist\\firefox || echo 'Directory exists'",
+    "build:chrome": "npm-run-all build:chrome:create-dir build:chrome:files build:chrome:icons build:chrome:rename-manifest",
+    "build:firefox": "npm-run-all build:firefox:create-dir build:firefox:files build:firefox:icons build:firefox:rename-manifest",
+    "build:chrome:create-dir": "mkdir -p dist/chrome",
+    "build:firefox:create-dir": "mkdir -p dist/firefox",
     "build:chrome:files": "copyfiles -u 1 src/* dist/chrome",
     "build:firefox:files": "copyfiles -u 1 src/* dist/firefox",
-    "build:chrome:rename-manifest": "powershell Move-Item -Path dist\\chrome\\manifest.chrome.json -Destination dist\\chrome\\manifest.json",
-    "build:firefox:rename-manifest": "powershell Move-Item -Path dist\\firefox\\manifest.firefox.json -Destination dist\\firefox\\manifest.json",
+    "build:chrome:icons": "copyfiles -u 1 src/icons/* dist/chrome/icons",
+    "build:firefox:icons": "copyfiles -u 1 src/icons/* dist/firefox/icons",
+    "build:chrome:rename-manifest": "move dist/chrome/manifest.chrome.json dist/chrome/manifest.json",
+    "build:firefox:rename-manifest": "move dist/firefox/manifest.firefox.json dist/firefox/manifest.json",
     "build": "npm-run-all build:chrome build:firefox"
   },
   "devDependencies": {
