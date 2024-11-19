@@ -3,10 +3,10 @@ chrome.runtime.onInstalled.addListener(() => {
 });
 
 async function fetchImageAndQuote() {
-  const apiUrl = "https://motivision.vercel.app/api/handler";  // Replace with your server's URL for the image
+  const apiUrl = "https://motivision.vercel.app/api/handler.js";  // Vercel-hosted API URL
 
   try {
-    // Fetch the image URL from the server-side handler
+    // Fetch image URL from the Vercel API
     const response = await fetch(apiUrl);
     const data = await response.json();
 
@@ -20,12 +20,14 @@ async function fetchImageAndQuote() {
         const quote = quoteData.content;
         const author = quoteData.author;
 
-        // Store the fetched image, quote, and author in Chrome's storage
+        // Store the fetched image, quote, and author in Chrome's local storage
         chrome.storage.local.set({
           backgroundImage: imageUrl,
           quote: quote,
           author: author
         });
+
+        console.log("Fetched and stored image and quote successfully.");
       }
     }
   } catch (error) {
@@ -33,7 +35,7 @@ async function fetchImageAndQuote() {
   }
 }
 
-// Fetch a motivational quote
+// Fetch a motivational quote from quotable.io API
 async function fetchQuote() {
   const QUOTE_API_URL = "https://api.quotable.io/random?tags=motivational";
 
@@ -42,11 +44,11 @@ async function fetchQuote() {
     const data = await response.json();
 
     if (data) {
-      return data;  // Return quote data
+      return data; // Return quote data
     }
   } catch (error) {
     console.error("Error fetching quote:", error);
   }
 
-  return null;
+  return null; // Return null if quote fetch fails
 }

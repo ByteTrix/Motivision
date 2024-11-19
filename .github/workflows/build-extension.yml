@@ -6,9 +6,7 @@ permissions:
 
 on:
   workflow_dispatch: # Manual trigger
-  push:
-    branches:
-      - main
+
 
 jobs:
   release:

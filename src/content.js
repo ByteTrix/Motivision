@@ -7,9 +7,9 @@ document.addEventListener("DOMContentLoaded", function () {
   // Show the loader initially
   loader.style.display = 'block';
 
-  // Display stored content and fetch new data in the background
+  // Fetch and display stored content first, then update in the background
   chrome.storage.local.get(['backgroundImage', 'quote', 'author'], function (data) {
-    // Display stored image
+    // Display stored background image
     if (data.backgroundImage) {
       document.body.style.backgroundImage = `url(${data.backgroundImage})`;
     } else {
@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", function () {
       console.log("No stored image found, applying fallback color.");
     }
 
-    // Display stored quote
+    // Display stored quote and author
     if (data.quote && data.author) {
       quoteElement.textContent = `"${data.quote}"`;
       authorElement.textContent = `- ${data.author}`;
@@ -28,7 +28,7 @@ document.addEventListener("DOMContentLoaded", function () {
       console.log("No stored quote found, displaying placeholder message.");
     }
 
-    // Hide the loader and show the content
+    // Hide the loader and display the content
     loader.style.display = 'none';
     quoteContainer.style.display = 'block';
 
@@ -37,38 +37,43 @@ document.addEventListener("DOMContentLoaded", function () {
     fetchQuote();
   });
 
-  // Fetch and store a new image
+  // Fetch a new background image from your Vercel-hosted API
   async function fetchImage() {
-    const UNSPLASH_API_URL = "https://api.unsplash.com/photos/random?client_id=mpBdvwJCIICVEIAKoEWhpoqCNbbc-lh2Xa7UDog_-Ro&count=1&query=nature&orientation=landscape";
+    const API_URL = "https://motivision.vercel.app/api/handler.js"; // URL to Vercel-hosted API
 
-    console.log("Fetching new image...");
     try {
-      const imageData = await fetch(UNSPLASH_API_URL).then(res => res.json());
-      const fullImageUrl = imageData[0].urls.regular;
+      const response = await fetch(API_URL);
+      const data = await response.json();
 
-      chrome.storage.local.set({ backgroundImage: fullImageUrl });
-      console.log("Fetched and stored new image URL.");
+      if (data && data.imageUrl) {
+        const imageUrl = data.imageUrl;
+        chrome.storage.local.set({ backgroundImage: imageUrl }); // Store new image URL
+        document.body.style.backgroundImage = `url(${imageUrl})`; // Update background image
+        console.log("Fetched and stored new image URL.");
+      }
     } catch (error) {
       console.error("Error fetching image:", error);
     }
   }
 
-  // Fetch and store a new quote
+  // Fetch a new motivational quote from quotable.io
   async function fetchQuote() {
     const QUOTE_API_URL = "https://api.quotable.io/random?tags=motivational";
 
-    console.log("Fetching new quote...");
     try {
-      const quoteData = await fetch(QUOTE_API_URL).then(res => res.json());
-      const newQuote = quoteData.content;
-      const newAuthor = quoteData.author;
+      const response = await fetch(QUOTE_API_URL);
+      const quoteData = await response.json();
 
-      chrome.storage.local.set({
-        quote: newQuote,
-        author: newAuthor,
-      });
+      if (quoteData) {
+        const newQuote = quoteData.content;
+        const newAuthor = quoteData.author;
+        chrome.storage.local.set({
+          quote: newQuote,
+          author: newAuthor,
+        });
 
-      console.log(`Fetched and stored new quote: "${newQuote}" by ${newAuthor}`);
+        console.log(`Fetched and stored new quote: "${newQuote}" by ${newAuthor}`);
+      }
     } catch (error) {
       console.error("Error fetching quote:", error);
     }
