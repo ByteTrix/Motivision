@@ -1,45 +1,40 @@
-name: Release
+name: Build Extension
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - main  # Trigger the workflow on push to the main branch
+  pull_request:
+    branches:
+      - main  # Trigger the workflow on PR to the main branch
+
 jobs:
-  release:
-    permissions:
-      contents: write  # Allow write access to release assets
-      issues: write
-      pull-requests: write
-    runs-on: windows-latest  # Use Windows environment for the job
+  build:
+    runs-on: windows-latest  # Use Windows runner to support PowerShell commands
 
     steps:
-      # 1. Checkout the repository
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Fetch full commit history
-          persist-credentials: false  # Don't persist credentials for later use
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-      # 2. Setup Node.js
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'  # Use the appropriate Node.js version for your project
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'  # You can use the latest LTS version here
 
-      # 3. Install dependencies
-      - run: npm ci  # Clean install (faster and more reliable than npm install)
+    - name: Install dependencies
+      run: npm install
 
-      # 4. Build your project (assumes your build process is in the 'build' script)
-      - run: npm run build  # Ensure this produces both dist/chrome and dist/firefox
+    - name: Build for Chrome and Firefox
+      run: npm run build  # Run your build script for both Chrome and Firefox
 
-      # 5. Get the Release Token (if you're using an external app for managing releases)
-      - name: Get Release Token
-        id: get_workflow_token
-        uses: peter-murray/workflow-application-token-action@v3
-        with:
-          application_id: ${{ secrets.RELEASE_APP_ID }}  # Store application ID in Secrets
-          application_private_key: ${{ secrets.RELEASE_APP_CERT }}  # Store the private key in Secrets
+    - name: Upload Chrome Extension to GitHub Releases (optional)
+      uses: actions/upload-artifact@v3
+      with:
+        name: chrome-extension
+        path: dist/chrome
 
-      # 6. Create GitHub Release and upload assets
-      - name: Create GitHub Release
-        run: |
-          release_tag="${GITHUB_REF#refs/tags/}"  # Extract the tag name
-          gh release create $release_tag dist/chrome/* dist/firefox/* --title "New Release" --notes "Release of the Chrome and Firefox extensions."
-        env:
-          GITHUB_TOKEN: ${{ steps.get_workflow_token.outputs.token }}  # Use the token from the previous step
+    - name: Upload Firefox Extension to GitHub Releases (optional)
+      uses: actions/upload-artifact@v3
+      with:
+        name: firefox-extension
+        path: dist/firefox
