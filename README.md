@@ -1,4 +1,4 @@
-# 🌟 Motivision
+# Motivision
 
 Motivision is a minimalist browser extension that transforms your new tab page into a source of daily inspiration. It seamlessly blends stunning landscape photography from Unsplash with thought-provoking quotes from Quotable, creating a tranquil and motivating start to your browsing sessions.
 
