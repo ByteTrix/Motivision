@@ -55,7 +55,7 @@ Motivision leverages Vercel for secure API key management.
 1. Create a `.env.local` file in the project's root directory.  
 2. Populate it with the following environment variables, substituting the placeholders with your actual API keys from Unsplash and Quotable:
 
-`UNSPLASH_ACCESS_KEY=your_unsplash_access_key`
+`UNS_API=your_unsplash_access_key`
 
 ### 🖥️ Run the Development Server
 
