@@ -18,11 +18,12 @@ Motivision is a minimalist browser extension that transforms your new tab page i
 
 **Chrome Web Store** :
 
-[![Available in the Chrome Web Store](https://developer.chrome.com/static/docs/webstore/branding/image/mPGKYBIR2uCP0ApchDXE.png)](https://chrome.google.com/webstore/detail/motivision/dkddhdionmphjmhmdoichopengpioaae)
+  [![Available in the Chrome Web Store](https://developer.chrome.com/static/docs/webstore/branding/image/mPGKYBIR2uCP0ApchDXE.png)](https://chrome.google.com/webstore/detail/motivision/dkddhdionmphjmhmdoichopengpioaae)
 
 **Firefox Addon** :
 
-[![Available in the Firefox Add-ons Store](https://blog.mozilla.org/addons/files/2015/11/get-the-addon.png)](https://addons.mozilla.org/en-US/firefox/addon/motivision/)
+  [![Available in the Firefox Add-ons Store](https://blog.mozilla.org/addons/files/2015/11/get-the-addon.png)](https://addons.mozilla.org/en-US/firefox/addon/motivision/)
+
 
 ## 🚀 Usage
 
