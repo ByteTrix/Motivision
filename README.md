@@ -41,7 +41,8 @@ Motivision leverages Vercel for secure API key management.
 
 ### 📂 Clone the Repository
 
-`git clone [https://github.com/kxvinthxngxvel/Motivision](https://github.com/kxvinthxngxvel/Motivision)`
+```git clone [https://github.com/kxvinthxngxvel/Motivision](https://github.com/kxvinthxngxvel/Motivision)```
+
 `cd Motivision`
 
 
