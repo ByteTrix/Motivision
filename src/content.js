@@ -39,7 +39,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Fetch and store a new image
   async function fetchImage() {
-    const UNSPLASH_API_URL = "https://motivision.vercel.app/api/handler.js";  // Updated URL to your Vercel-hosted API
+    const UNSPLASH_API_URL = "https://motivision.vercel.app/api/handler.js";  // Vercel-hosted API for image
 
     console.log("Fetching new image...");
     try {
@@ -53,15 +53,15 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // Fetch and store a new quote
+  // Fetch and store a new quote from ZenQuotes
   async function fetchQuote() {
-    const QUOTE_API_URL = "https://motivision.vercel.app/api/handlerq.js";
+    const QUOTE_API_URL = "https://motivision.vercel.app/api/handlerq.js";  // Your ZenQuotes API URL
 
     console.log("Fetching new quote...");
     try {
       const quoteData = await fetch(QUOTE_API_URL).then(res => res.json());
-      const newQuote = quoteData.content;
-      const newAuthor = quoteData.author;
+      const newQuote = quoteData[0].q; // Quote text
+      const newAuthor = quoteData[0].a; // Author
 
       chrome.storage.local.set({
         quote: newQuote,

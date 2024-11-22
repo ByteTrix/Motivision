@@ -8,6 +8,10 @@
       {
         "src": "api/handler.js",
         "use": "@vercel/node"
+      },
+      {
+        "src": "api/handlerq.js",
+        "use": "@vercel/node"
       }
     ],
   "outputDirectory": "dist"
