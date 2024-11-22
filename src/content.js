@@ -55,7 +55,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Fetch and store a new quote
   async function fetchQuote() {
-    const QUOTE_API_URL = "http://api.quotable.io/random?tags=motivational";
+    const QUOTE_API_URL = "https://motivision.vercel.app/api/handlerq.js";
 
     console.log("Fetching new quote...");
     try {
