@@ -5,7 +5,7 @@ chrome.runtime.onInstalled.addListener(() => {
 async function fetchImageAndQuote() {
   // Updated API URLs
   const UNSPLASH_API_URL = "https://motivision.vercel.app/api/handler.js";  // Vercel-hosted API for image
-  const QUOTE_API_URL = "http://api.quotable.io/random?tags=motivational";  // Existing quote API
+  const QUOTE_API_URL = "https://motivision.vercel.app/api/handlerq.js";  // Existing quote API
 
   try {
     // Fetch image and quote in parallel
