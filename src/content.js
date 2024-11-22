@@ -60,8 +60,10 @@ document.addEventListener("DOMContentLoaded", function () {
     console.log("Fetching new quote...");
     try {
       const quoteData = await fetch(QUOTE_API_URL).then(res => res.json());
-      const newQuote = quoteData[0].q; // Quote text
-      const newAuthor = quoteData[0].a; // Author
+      
+      // Directly access quote and author from the response
+      const newQuote = quoteData.quote; // Quote text
+      const newAuthor = quoteData.author; // Author
 
       chrome.storage.local.set({
         quote: newQuote,
